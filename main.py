@@ -1,12 +1,16 @@
+import json
 from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
 
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 def gen_pass():
-    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
@@ -18,8 +22,7 @@ def gen_pass():
     password_symbols = [random.choice(symbols) for _ in range(nr_symbols)]
     password_nums = [random.choice(numbers) for item in range(nr_numbers)]
 
-
-    password_list = password_letters+password_nums+password_symbols
+    password_list = password_letters + password_nums + password_symbols
 
     random.shuffle(password_list)
 
@@ -27,7 +30,7 @@ def gen_pass():
 
     print(f"Your password is: {password}")
 
-    pass_entry.delete(0,END)
+    pass_entry.delete(0, END)
     pass_entry.insert(0, password)
     pyperclip.copy(password)
 
@@ -40,18 +43,37 @@ def save_details():
     email = email_entry.get()
     passwd = pass_entry.get()
 
-    if len(website) == 0 or len(email) == 0 or len(passwd)==0:
+    new_dict = {
+        website: {
+            "email": email,
+            "password": passwd
+        }
+    }
+
+    if len(website) == 0 or len(email) == 0 or len(passwd) == 0:
         messagebox.showerror(title="Empty Input", message="Please fill all the fields!!!")
     else:
         isOk = messagebox.askokcancel(title=website, message=f"There are the details entered. \nEmail: {email}\nPassword:{passwd}\nIs it ok to Save?")
 
         if isOk:
-            with open("./data.txt", "a") as file:
-                file.write(f"{website} | {email} | {passwd}\n")
+            try:
+                with open("./data.json", "r") as file:
+                    data = json.load(file)
 
-            website_entry.delete(0, len(website))
-            email_entry.delete(0, len(email))
-            pass_entry.delete(0, len(passwd))
+            except FileNotFoundError as errorMessage:
+                print(f"File {errorMessage}does not exists, creating new...")
+                with open("./data.json", "w") as file:
+                    json.dump(new_dict, file, indent=4)
+            else:
+                data.update(new_dict)
+
+                with open("./data.json", "w") as file:
+                    json.dump(data, file, indent=4)
+
+            finally:
+                website_entry.delete(0, len(website))
+                email_entry.delete(0, len(email))
+                pass_entry.delete(0, len(passwd))
 
 
 # ---------------------------- UI SETUP ------------------------------- #
