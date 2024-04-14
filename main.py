@@ -76,6 +76,26 @@ def save_details():
                 pass_entry.delete(0, len(passwd))
 
 
+def search_pass():
+    try:
+        with open("./data.json", "r") as file:
+            data = json.load(file)
+
+    except FileNotFoundError as errorMessage:
+        print(f"File {errorMessage} does not exists...")
+
+    else:
+        website = website_entry.get()
+
+        if website in data:
+            creds = data[website]
+            email = creds["email"]
+            passwd = creds["password"]
+
+            messagebox.showinfo(title=website, message=f"Email: {email}\nPassword: {passwd}")
+        else:
+            messagebox.showerror(title=website, message=f"No Details available for given website")
+
 # ---------------------------- UI SETUP ------------------------------- #
 
 window = Tk()
@@ -92,27 +112,30 @@ canvas.grid(column=2, row=1)
 website_label = Label(text="Website:", padx=5, pady=5)
 website_label.grid(column=1, row=2)
 
-website_entry = Entry(width=50)
-website_entry.grid(column=2, row=2, columnspan=2)
+website_entry = Entry(width=33)
+website_entry.grid(column=2, row=2)
 website_entry.focus()
+
+search_btn = Button(text="Search", width=15, command=search_pass)
+search_btn.grid(column=3, row=2)
 
 email_label = Label(text="Email/Username:", padx=5, pady=5)
 email_label.grid(column=1, row=3)
 
-email_entry = Entry(width=50)
+email_entry = Entry(width=52)
 email_entry.grid(column=2, row=3, columnspan=2)
 email_entry.insert(0, "snehalchodankar")
 
 pass_label = Label(text="Password:", padx=5, pady=5)
 pass_label.grid(column=1, row=4)
 
-pass_entry = Entry(width=30)
+pass_entry = Entry(width=33)
 pass_entry.grid(column=2, row=4)
 
-pass_btn = Button(text="Generate Password", command=gen_pass)
+pass_btn = Button(text="Generate Password", width=15, command=gen_pass)
 pass_btn.grid(column=3, row=4)
 
-add_btn = Button(text="Add", width=41, command=save_details)
+add_btn = Button(text="Add", width=44, command=save_details)
 add_btn.grid(column=2, row=5, columnspan=2)
 
 window.mainloop()
